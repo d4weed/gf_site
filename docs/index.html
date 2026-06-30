@@ -455,6 +455,16 @@
   .age-gate .age-deny { font-family: var(--font-sans); font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.9); margin: var(--space-2) 0 0; max-width: 36ch; }
   .age-gate .age-deny[hidden] { display: none; }
   @media (max-width: 420px) { .age-gate .age-actions { flex-direction: column; width: 100%; } .age-gate .age-btn { width: 100%; } }
+  /* ===== Cookie/analytics consent (GDPR) — gates Google Analytics until accepted ===== */
+  .consent { position: fixed; left: 50%; transform: translateX(-50%); bottom: var(--space-4); z-index: 150; width: min(680px, calc(100% - 2 * var(--gutter))); background: var(--bg-white); border: 1px solid var(--rule-strong); box-shadow: var(--shadow-2); padding: var(--space-4) var(--space-5); display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
+  .consent[hidden] { display: none; }
+  .consent-text { font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--fg-3); margin: 0; flex: 1 1 280px; }
+  .consent-actions { display: flex; gap: 10px; flex: 0 0 auto; }
+  .consent-btn { font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 10px 18px; cursor: pointer; border: 1px solid var(--fg-1); background: transparent; color: var(--fg-1); transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
+  .consent-yes { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .consent-yes:hover { background: var(--accent-hover); }
+  .consent-no:hover { background: var(--bg-1); }
+  @media (max-width: 520px) { .consent { flex-direction: column; align-items: stretch; gap: var(--space-3); } .consent-actions { justify-content: flex-end; } }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   }
@@ -473,6 +483,14 @@
         <button class="age-btn age-no" type="button" data-en="No">No</button>
       </div>
       <p class="age-deny" data-en="Sorry — you must be of legal drinking age to access this site." hidden>Lo sentimos: debes tener la edad legal para consumir alcohol para acceder a este sitio.</p>
+    </div>
+  </div>
+  <!-- Cookie/analytics consent (GDPR): Google Analytics only loads after Accept -->
+  <div id="consent" class="consent" role="region" aria-label="Privacidad" hidden>
+    <p class="consent-text" data-en="We use Google Analytics to understand how the site is used. It only loads if you accept.">Usamos Google Analytics para entender cómo se usa el sitio. Solo se carga si lo aceptas.</p>
+    <div class="consent-actions">
+      <button class="consent-btn consent-no" type="button" data-en="Decline">Rechazar</button>
+      <button class="consent-btn consent-yes" type="button" data-en="Accept">Aceptar</button>
     </div>
   </div>
   <template id="__bundler_thumbnail">
@@ -833,19 +851,21 @@ Nosotros decidimos quedarnos.</p>
       // Reflect the wine in the URL (?wine=<id>) so detail pages are shareable.
       // push:false on initial load / popstate — don't rewrite history or the URL
       // on load (mirrors the ?lang load caveat).
-      if (push) { const u = new URL(location.href); u.searchParams.set('wine', id); history.pushState({ wine: id }, '', u); }
+      if (push) { const u = new URL(location.href); u.searchParams.set('wine', id); history.pushState({ wine: id }, '', u); if (window.__gfTrackPage) window.__gfTrackPage(); }
     };
     window.openDetail = openDetail;
     // Drop ?wine when returning to the home view (preserves other params like ?lang).
     const dropWineParam = () => {
       if (!new URLSearchParams(location.search).has('wine')) return;
       const u = new URL(location.href); u.searchParams.delete('wine'); history.pushState({}, '', u);
+      if (window.__gfTrackPage) window.__gfTrackPage();
     };
     // Browser back/forward: sync the view to the URL without writing new history.
     window.addEventListener('popstate', () => {
       const id = new URLSearchParams(location.search).get('wine');
       if (id && WINES.find(x => x.id === id)) openDetail(id, { push: false });
       else if (state.route !== 'home') route('home');
+      if (window.__gfTrackPage) window.__gfTrackPage();
     });
 
     // ------- Router -------
@@ -1132,5 +1152,37 @@ Nosotros decidimos quedarnos.</p>
       applyTweaks();
     };
     } // end if (TWEAKS_ENABLED)
+
+    // ------- Analytics (GA4), gated by consent (GDPR) — nothing is sent to Google until "Accept" -------
+    (function () {
+      const GA_ID = 'G-2MM4MWELZG';
+      const KEY = 'gf.consent';
+      let loaded = false;
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      const loadGA = () => {
+        if (loaded) return; loaded = true;
+        const s = document.createElement('script');
+        s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+        document.head.appendChild(s);
+        gtag('js', new Date());
+        gtag('config', GA_ID);   // records the initial page_view (current URL, incl. ?wine=)
+      };
+      // SPA page views — called from openDetail / dropWineParam / popstate after the URL changes.
+      window.__gfTrackPage = () => {
+        if (!loaded) return;
+        gtag('event', 'page_view', { page_location: location.href, page_title: document.title, page_path: location.pathname + location.search });
+      };
+      const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
+      const banner = document.getElementById('consent');
+      const choose = (v) => { try { localStorage.setItem(KEY, v); } catch (e) {} if (banner) banner.hidden = true; if (v === 'granted') loadGA(); };
+      if (banner) {
+        banner.querySelector('.consent-yes').addEventListener('click', () => choose('granted'));
+        banner.querySelector('.consent-no').addEventListener('click', () => choose('denied'));
+      }
+      const stored = get();
+      if (stored === 'granted') loadGA();
+      else if (stored !== 'denied' && banner) banner.hidden = false;   // show only when no choice made yet
+    })();
   </script>
 </body></html>
