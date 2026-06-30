@@ -120,7 +120,7 @@
   /* ---------- Wine grid ---------- */
   .wines { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-7) var(--space-6); }
   .wine { display: flex; flex-direction: column; cursor: pointer; text-align: left; background: transparent; border: 0; padding: 0; color: inherit; }
-  .wine .ph { aspect-ratio: 3/4; background: var(--bg-2); overflow: hidden; position: relative; margin-bottom: var(--space-4); }
+  .wine .ph { aspect-ratio: 3/4; background: #fff; overflow: hidden; position: relative; margin-bottom: var(--space-4); }
   .wine .ph img { width: 100%; height: 100%; object-fit: contain; object-position: center; transition: transform 1.2s var(--ease-out); padding: 0; display:block; }
   .wine:hover .ph img { transform: scale(1.02); }
   /* Wine names as brand references — system sans, Title Case, never label mimicry */
@@ -282,7 +282,7 @@
   /* Wine trio at end of scroll — cards with prose, not just grid */
   .wine-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-7); }
   .wine-trio .item { display: flex; flex-direction: column; cursor: pointer; background: transparent; border: 0; padding: 0; text-align: left; color: inherit; }
-  .wine-trio .ph { aspect-ratio: 3/4; background: var(--bg-2); overflow: hidden; position: relative; margin-bottom: var(--space-5); }
+  .wine-trio .ph { aspect-ratio: 3/4; background: #fff; overflow: hidden; position: relative; margin-bottom: var(--space-5); }
   .wine-trio .ph img { width: 100%; height: 100%; object-fit: contain; transition: transform 1.2s var(--ease-out); }
   .wine-trio .item:hover .ph img { transform: scale(1.02); }
   .wine-trio .name { font-family: var(--font-sans); font-weight: 500; font-size: 27px; line-height: 1.05; letter-spacing: -0.02em; color: var(--fg-1); margin: 0 0 var(--space-3); }
