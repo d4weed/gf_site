@@ -59,11 +59,11 @@ Hero (full-bleed parallax photo + motto) → **I El proyecto** (founders' story 
 - **Router / views:** `route('home'|'detail')`; brand logo → home; in-page anchors via `goToAnchor()` with scroll-spy highlighting the active nav item.
 - **Wine detail:** click any wine (cards or footer) → `openDetail(id)`; "Otros vinos" switches wine in place.
 - **Age gate (18+):** opaque overlay on first visit. An inline `<head>` script adds `age-gated`/`age-ok` to `<html>` before paint (no flash). **Yes** → store `gf.age.ok`, reveal site, move focus to the visually-hidden page `<h1>` (a `tabindex="-1"` script-managed landing target — screen readers announce the title, and `.vh` + `outline:none` means no visible focus ring; previously focused the logo button, which showed a jarring `:focus-visible` ring on programmatic focus). **No** → show denial message, stay blocked. Focus is trapped in the dialog while open. *(Self-declaration is the correct pattern for a brand site; the legally-robust age verification belongs at the shop's checkout, not here.)*
-- **Mobile nav (≤820px):** hamburger → full-screen overlay menu (links + shop + ES/EN); closes on navigation; locks body scroll.
+- **Mobile nav (≤910px):** hamburger → full-screen overlay menu (links + shop + ES/EN); closes on navigation; locks body scroll. (The JS resize handler that auto-closes the menu uses the same 910px threshold — keep them in sync.)
 - **Parallax** on full-bleed photos; **disabled** under `prefers-reduced-motion` (handled in JS and CSS).
 
 ## Responsive
-Breakpoints: **820px** (nav → hamburger; footer → 2-col), **800/880px** (existing grid collapses), **760px** (data bands → 2-up; values may wrap), **600px** (tighter section padding), **520px** (footer → 1-col; hero text wraps). Data bands on desktop size each column to its content (`max-content` + `space-between`) so values never wrap.
+Breakpoints: **910px** (nav → hamburger), **820px** (footer → 2-col), **800/880px** (existing grid collapses), **760px** (data bands → 2-up; values may wrap), **600px** (tighter section padding), **520px** (footer → 1-col; hero text wraps). Data bands on desktop size each column to its content (`max-content` + `space-between`) so values never wrap.
 
 ## Accessibility (already done)
 Single landmarks; `lang` set & updates; all images have `alt`; icon links have `aria-label`; visually-hidden `H1` on home; heading levels ordered; real anchor hrefs; `:focus-visible` outline; reduced-motion support; AA contrast (see `--fg-4` note). Keep these when editing.
