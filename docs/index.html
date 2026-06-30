@@ -863,9 +863,12 @@ Nosotros decidimos quedarnos.</p>
 
     // ------- Nav: in-page anchors + scrollspy -------
     const goToAnchor = (anchor) => {
-      const doScroll = () => { const t = document.getElementById(anchor); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-      if (state.route !== 'home') { route('home'); requestAnimationFrame(() => requestAnimationFrame(doScroll)); }
-      else doScroll();
+      const doScroll = (behavior) => { const t = document.getElementById(anchor); if (t) t.scrollIntoView({ behavior, block: 'start' }); };
+      // Returning from the detail view: jump straight to the anchor (instant, within one
+      // rAF so the scroll lands before the first paint) — avoids flashing at the top and
+      // then smooth-scrolling all the way down. In-page nav on home stays smooth.
+      if (state.route !== 'home') { route('home'); requestAnimationFrame(() => { doScroll('instant'); updateHeader(); }); }
+      else doScroll('smooth');
     };
     window.goToAnchor = goToAnchor;
     document.querySelector('.brand').addEventListener('click', () => {
