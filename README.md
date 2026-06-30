@@ -79,14 +79,34 @@ During design there was an in-page font/accent picker ("Tweaks"). It is **locked
 4. ~~**Optimise photos.**~~ **Done.** The six editorial photos (`photo-*.jpg`) were converted to grayscale colorspace, the 30 MP `photo-vacio-aire.jpg` was downscaled to 2560 px on the long edge, and all were recompressed at q80 (`cjpeg -optimize`, EXIF stripped). Total photo payload dropped ~10.9 MB → ~3.7 MB. **Note:** the grayscale look on the hero and full-bleed bands is now baked into the source files — the `filter: grayscale(...)` CSS was removed from `.hero img` / `.full-bleed img`. So any **replacement** photo for those slots must be pre-converted to B&W (e.g. `jpegtran -grayscale in.jpg > out.jpg`); a color JPEG would now render in color. (The unused design-system selectors `.feature`/`.split`/`.cart-item` etc. still carry `filter: grayscale(1)` for any future color-sourced component.)
 
 ## Custom domain cutover (gonzalezfischer.com)
-The production domain is **gonzalezfischer.com**, currently still served by a WordPress site. Do these steps **only when ready to switch**, because configuring the custom domain in GitHub Pages makes the `…github.io/gf_site/` URL redirect to the custom domain — so until DNS points here, the preview URL would redirect to whatever the domain still serves (WordPress).
+The production domain is **gonzalezfischer.com**. Setup as of the cutover planning:
+- **Registrar:** Amazon Registrar. **Authoritative DNS:** DreamHost (`ns1/2/3.dreamhost.com`). The AWS Route 53 hosted zone is **dormant/unused** — make all DNS changes in the **DreamHost** panel, not AWS.
+- Currently the apex serves a **WordPress** site at DreamHost. **Email** (DreamHost mailboxes) and a **`nutricional.gonzalezfischer.com`** static subdomain are also on DreamHost and **must keep working**.
 
-Preview safely in the meantime at **https://d4weed.github.io/gf_site/** (all asset paths are relative, so the subpath works; only the absolute OG meta URLs differ, and those only matter to social crawlers).
+Preview safely in the meantime at **https://d4weed.github.io/gf_site/**. Do **not** add `docs/CNAME` or set a GitHub custom domain before DNS is moved — doing so makes the `github.io` preview 301-redirect to `gonzalezfischer.com` (still WordPress until cutover).
 
-Cutover steps, in order:
-1. **DNS** at the registrar — point the apex `gonzalezfischer.com` at GitHub Pages' four A records (`185.199.108.153`, `.109.153`, `.110.153`, `.111.153`) and AAAA records, and add a `www` CNAME → `d4weed.github.io`. (Removes/replaces the WordPress records — this is the irreversible-feeling step; lower the TTL a day before to speed rollback.)
-2. **CNAME file** — add a `docs/CNAME` containing `gonzalezfischer.com` (one line), commit & push.
-3. **GitHub Pages settings** → set **Custom domain** to `gonzalezfischer.com`, wait for the DNS check, then enable **Enforce HTTPS** once the cert is issued.
+### Pre-cutover DNS snapshot (revert reference — all values are public)
+Only the **website** records change. Everything in *Email* and *Subdomain* stays exactly as-is.
+
+| Group | Records | Action |
+|---|---|---|
+| **Website (apex)** | `@ A 75.119.204.193`, `www A 75.119.204.193` | **Replace** → GitHub Pages |
+| **Web-hosting infra** (removed automatically by "DNS Only") | `ssh A 75.119.204.193`, `ftp A 75.119.204.193` (and `mysql A 64.90.32.130`) | Auto-removed; harmless. Re-enabling hosting restores them. |
+| **Email — KEEP** | `@ MX 0 mx1/mx2.dreamhost.com`, `mail MX 0 mx1/mx2`, `mail A 64.90.62.162`, `mailboxes A 69.163.136.97`, `webmail A 69.163.136.138`, `www.mailboxes A 69.163.136.97`, `www.webmail A 69.163.136.138`, `autoconfig CNAME autoconfig.dreamhost.com`, `_autodiscover._tcp SRV 5 0 443 autoconfig.dreamhost.com`, `@ TXT v=spf1 mx include:netblocks.dreamhost.com include:relay.mailchannels.net -all`, `dreamhost._domainkey TXT (DKIM)` | **Do not touch** |
+| **Subdomain `nutricional` — KEEP** | `nutricional A 75.119.207.36`, `ftp.nutricional A 75.119.207.36`, `ssh.nutricional A 75.119.207.36`, `www.nutricional A 75.119.207.36` | **Do not touch** |
+| **Zone** | `@ NS ns1/2/3.dreamhost.com` | Keep |
+
+### Cutover steps, in order
+1. **Remove the DreamHost SSL cert** on the apex if one exists — DreamHost won't release the records for "DNS Only" while a cert is attached. (GitHub issues its own cert later.)
+2. **Set the apex to "DNS Only"** (Manage Websites → Settings → *Set to DNS Only*; or just add the `@ A` record below and accept the *Deactivate Website* prompt). This removes only the `@`, `www`, `ssh`, `ftp` A records, leaves Custom DNS + email intact, and **does not close the hosting plan**. Keep the WordPress files for rollback.
+3. **Verify** on the DNS page that the entire *Email* and *Subdomain* groups above are still present. Re-add any that vanished from this table.
+4. **Add the website records:**
+   - `@ A` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `@ AAAA` (optional) → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
+   - `www` → `CNAME d4weed.github.io` (replace its old A record)
+5. **GitHub side (do right after DNS, to minimise the gap):** add `docs/CNAME` containing `gonzalezfischer.com`, push; Pages picks it up (or set Pages → Custom domain manually). Wait for the DNS check, then enable **Enforce HTTPS** once the cert issues.
+
+**Rollback:** re-add `@ A 75.119.204.193` and `www A 75.119.204.193` (or re-enable hosting). Email and the subdomain never moved, so they're never at risk. No CAA record exists, so GitHub's Let's Encrypt cert provisions without issue.
 
 ## How to evolve it
 - **Edit copy:** find the text in `index.html`. For bilingual strings, update **both** the visible Spanish **and** the `data-en` attribute next to it (the one easy thing to forget).
