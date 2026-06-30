@@ -58,7 +58,7 @@ Hero (full-bleed parallax photo + motto) → **I El proyecto** (founders' story 
 ## Interactions
 - **Router / views:** `route('home'|'detail')`; brand logo → home; in-page anchors via `goToAnchor()` with scroll-spy highlighting the active nav item.
 - **Wine detail:** click any wine (cards or footer) → `openDetail(id)`; "Otros vinos" switches wine in place.
-- **Age gate (18+):** opaque overlay on first visit. An inline `<head>` script adds `age-gated`/`age-ok` to `<html>` before paint (no flash). **Yes** → store `gf.age.ok`, reveal site, focus the logo. **No** → show denial message, stay blocked. Focus is trapped in the dialog while open. *(Self-declaration is the correct pattern for a brand site; the legally-robust age verification belongs at the shop's checkout, not here.)*
+- **Age gate (18+):** opaque overlay on first visit. An inline `<head>` script adds `age-gated`/`age-ok` to `<html>` before paint (no flash). **Yes** → store `gf.age.ok`, reveal site, move focus to the visually-hidden page `<h1>` (a `tabindex="-1"` script-managed landing target — screen readers announce the title, and `.vh` + `outline:none` means no visible focus ring; previously focused the logo button, which showed a jarring `:focus-visible` ring on programmatic focus). **No** → show denial message, stay blocked. Focus is trapped in the dialog while open. *(Self-declaration is the correct pattern for a brand site; the legally-robust age verification belongs at the shop's checkout, not here.)*
 - **Mobile nav (≤820px):** hamburger → full-screen overlay menu (links + shop + ES/EN); closes on navigation; locks body scroll.
 - **Parallax** on full-bleed photos; **disabled** under `prefers-reduced-motion` (handled in JS and CSS).
 

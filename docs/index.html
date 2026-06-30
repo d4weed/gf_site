@@ -41,6 +41,9 @@
   html, body { background: var(--bg-1); overflow-x: hidden; }
   body { margin: 0; font-family: var(--font-sans); color: var(--fg-1); }
   .vh { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  /* .vh is only ever a script-managed focus target (e.g. after the age gate closes);
+     it's not in the tab order, so suppressing its ring doesn't affect WCAG 2.4.7. */
+  .vh:focus { outline: none; }
   /* ---------- Header (overlay over hero, solid on scroll) ---------- */
   .site-header {
     position: fixed; top: 0; left: 0; right: 0; z-index: 50;
@@ -495,7 +498,7 @@
   <main>
     <!-- ================== HOME — SCROLLYTELLING ================== -->
     <div class="view active long-form" data-view="home">
-      <h1 class="vh" data-en="González Fischer — artisan wines from Sacramenia, Segovia">González Fischer — vinos artesanales de Sacramenia, Segovia</h1>
+      <h1 class="vh" tabindex="-1" data-en="González Fischer — artisan wines from Sacramenia, Segovia">González Fischer — vinos artesanales de Sacramenia, Segovia</h1>
 
       <!-- 00. Hero (parallax) -->
       <section class="hero parallax" style="padding:0" data-screen-label="hero">
@@ -956,7 +959,10 @@ Nosotros decidimos quedarnos.</p>
         try { localStorage.setItem('gf.age.ok', '1'); } catch (e) {}
         document.documentElement.classList.remove('age-gated');
         document.documentElement.classList.add('age-ok');
-        const b = document.querySelector('.brand'); if (b) b.focus();
+        // Move focus into the revealed page (don't lose it) without a jarring ring on
+        // the logo: land on the visually-hidden page <h1> — screen readers announce the
+        // title, and being .vh + outline:none means no visible focus ring in any browser.
+        const h = document.querySelector('h1.vh'); if (h) h.focus({ preventScroll: true });
       });
       ageGate.querySelector('.age-no').addEventListener('click', () => {
         const d = ageGate.querySelector('.age-deny'); if (d) d.hidden = false;
