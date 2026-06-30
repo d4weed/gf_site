@@ -33,9 +33,10 @@ docs/
 - **Content as data:** the three wines live in the `WINES` array in the `<script>` (id, name, price, image, plus `idea` / `making` / `tasting` / `pairing` / `tech`, and an `en:{…}` block mirroring all text). Narrative prose (the chapters) lives directly in the HTML.
 
 ## Internationalisation (ES / EN)
-No JSON — translations live **inline**, two mechanisms:
+No JSON — translations live **inline**, three mechanisms:
 1. **Static text:** any element with a `data-en="…"` attribute. Its Spanish is the element's normal content; the English is the attribute. On load the script snapshots the Spanish into `data-es` and swaps `innerHTML` between the two. To translate a new element, add a `data-en`.
-2. **JS-rendered text (wines + UI labels):** the `UI` dictionary (`{es, en}` per key) and each wine's `en:{…}` block. `wineView(w)` returns the language-correct merge.
+2. **`alt` attributes (editorial photos):** an element with `data-en-alt="…"` swaps its **`alt`** attribute (not innerHTML) — the Spanish lives in `alt="…"`, the English in `data-en-alt="…"`. The script snapshots the Spanish into `data-es-alt`. Use this for images; a plain `data-en` on an `<img>` would not work (the swap targets innerHTML). The bottle photos are JS-rendered, so they localise via mechanism 3 (`tr('bottleOf')`) instead. Logos and certification seals keep one proper-noun `alt` in both languages.
+3. **JS-rendered text (wines + UI labels):** the `UI` dictionary (`{es, en}` per key) and each wine's `en:{…}` block. `wineView(w)` returns the language-correct merge.
 - Language is chosen by `?lang=` → `localStorage('gf.lang')` → default `es`. The header **ES / EN** toggle calls `applyLang(l, true)`; it writes `?lang=` to the URL **only on click** (writing it on load caused a preview reload loop — do not change this).
 - Price/number formatting also localises (e.g. `€38,00` ES vs `€38.00` EN) — currently prices are hidden, but the logic remains.
 

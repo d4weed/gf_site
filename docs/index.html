@@ -498,7 +498,7 @@
 
       <!-- 00. Hero (parallax) -->
       <section class="hero parallax" style="padding:0" data-screen-label="hero">
-        <img src="assets/photo-paramo-cliff.jpg" alt="Páramos del Duratón">
+        <img src="assets/photo-paramo-cliff.jpg" alt="Páramos del Duratón" data-en-alt="The Duratón highlands">
         <div class="hero-lockup">
           <div class="tag">ARS LONGA, VITA BREVIS</div>
           <div class="hero-kicker" data-en="ARTISAN WINES · SACRAMENIA · SEGOVIA">VINOS ARTESANALES · SACRAMENIA · SEGOVIA</div>
@@ -524,7 +524,7 @@
 
       <!-- Full-bleed parallax: el camino de vuelta -->
       <figure class="full-bleed parallax">
-        <img src="assets/photo-path.jpg" alt="Camino entre los páramos" loading="lazy" decoding="async">
+        <img src="assets/photo-path.jpg" alt="Camino entre los páramos" data-en-alt="A path through the highlands" loading="lazy" decoding="async">
       </figure>
 
       <!-- II · El terruño — subsection 1 (header) -->
@@ -540,7 +540,7 @@
 
       <!-- Full-bleed parallax: panorama -->
       <figure class="full-bleed parallax">
-        <img src="assets/photo-paramo-pano.jpg" alt="Panorámica del páramo" loading="lazy" decoding="async">
+        <img src="assets/photo-paramo-pano.jpg" alt="Panorámica del páramo" data-en-alt="Panorama of the highlands" loading="lazy" decoding="async">
       </figure>
 
       <!-- I · El terruño — subsection 2 (lead-in + facts) -->
@@ -564,7 +564,7 @@ Nosotros decidimos quedarnos.</p>
 
       <!-- Full-bleed parallax: encina -->
       <figure class="full-bleed parallax">
-        <img src="assets/photo-lone-oak.jpg" alt="Encina solitaria sobre muro de piedra" loading="lazy" decoding="async">
+        <img src="assets/photo-lone-oak.jpg" alt="Encina solitaria sobre muro de piedra" data-en-alt="A lone holm oak on a stone wall" loading="lazy" decoding="async">
       </figure>
 
       <!-- II · El vino — subsection 1 (header) -->
@@ -588,7 +588,7 @@ Nosotros decidimos quedarnos.</p>
 
       <!-- Full-bleed parallax: viñedos -->
       <figure class="full-bleed parallax">
-        <img src="assets/photo-paramera.jpg" alt="Viñedos bajo el cielo del páramo" loading="lazy" decoding="async">
+        <img src="assets/photo-paramera.jpg" alt="Detalle del páramo" data-en-alt="Detail of the highlands" loading="lazy" decoding="async">
       </figure>
 
       <!-- II · El vino — subsection 2 (lead-in + facts) -->
@@ -610,7 +610,7 @@ Nosotros decidimos quedarnos.</p>
 
       <!-- Full-bleed parallax: vacío y aire -->
       <figure class="full-bleed parallax">
-        <img src="assets/photo-vacio-aire.jpg" alt="Viento sobre las piedras del páramo" loading="lazy" decoding="async">
+        <img src="assets/photo-vacio-aire.jpg" alt="Viento sobre las piedras del páramo" data-en-alt="Wind over the stones of the highlands" loading="lazy" decoding="async">
       </figure>
 
       <!-- V · Los vinos -->
@@ -923,10 +923,15 @@ Nosotros decidimos quedarnos.</p>
     // ------- i18n: static-text swap + language switch (ES / EN) -------
     const i18nEls = Array.from(document.querySelectorAll('[data-en]'));
     i18nEls.forEach(el => { el.dataset.es = el.innerHTML; });
+    // Attribute-level i18n: elements with data-en-alt swap their `alt` attribute
+    // (the visible Spanish lives in alt="", the English in data-en-alt="").
+    const altEls = Array.from(document.querySelectorAll('[data-en-alt]'));
+    altEls.forEach(el => { el.dataset.esAlt = el.getAttribute('alt') || ''; });
     const applyLang = (l, pushUrl) => {
       lang = (l === 'en') ? 'en' : 'es';
       document.documentElement.lang = lang;
       i18nEls.forEach(el => { el.innerHTML = (lang === 'en') ? el.dataset.en : el.dataset.es; });
+      altEls.forEach(el => { el.setAttribute('alt', (lang === 'en') ? el.dataset.enAlt : el.dataset.esAlt); });
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
       localStorage.setItem('gf.lang', lang);
       if (pushUrl) { try { const u = new URL(location.href); u.searchParams.set('lang', lang); history.replaceState(null, '', u); } catch (e) {} }
