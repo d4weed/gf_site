@@ -109,6 +109,15 @@ Only the **website** records change. Everything in *Email* and *Subdomain* stays
 
 **Rollback:** re-add `@ A 75.119.204.193` and `www A 75.119.204.193` (or re-enable hosting). Email and the subdomain never moved, so they're never at risk. No CAA record exists, so GitHub's Let's Encrypt cert provisions without issue.
 
+## Backlog / next steps (not yet done)
+- **DMARC record (email hardening).** SPF + DKIM exist; DMARC is missing. Add a TXT record at **DreamHost** DNS — Name `_dmarc`, Value `v=DMARC1; p=none; rua=mailto:info@gonzalezfischer.com; fo=1` (monitoring mode — no delivery impact). Review the aggregate reports for a few weeks, then tighten `p=none` → `p=quarantine` → `p=reject`. (Existing SPF/DKIM records are listed in the cutover snapshot above.)
+- **Granular GA4 events (behaviour tracking).** Today only `page_view`s fire (initial load + SPA wine navigations via `window.__gfTrackPage`). To see what visitors actually *do*: (a) enable **Enhanced Measurement** in the GA4 property (outbound clicks, scrolls, etc.) — no code needed; and (b) add custom `gtag('event', …)` calls for meaningful interactions, **routed through the existing consent-gated plumbing** so nothing fires unless GA is loaded:
+  - wine detail open (`openDetail`) → `select_item`/`view_item` with wine id + name
+  - **Buy** button → `gonzalezfischer.square.site` (mark as a conversion)
+  - Shop link clicks (nav + footer)
+  - Language toggle (ES/EN), age-gate accept
+  - Section reached (proyecto / terruño / oficio / vinos) — can reuse the existing scroll-spy `IntersectionObserver`
+
 ## How to evolve it
 - **Edit copy:** find the text in `index.html`. For bilingual strings, update **both** the visible Spanish **and** the `data-en` attribute next to it (the one easy thing to forget).
 - **Add / change a wine:** edit the `WINES` array (add `id`, `name`, `img`, `kind`, `idea`, `making`, `tasting`, `pairing`, `tech`, and the parallel `en:{…}`). Add its bottle image to `assets/` and a footer link.
