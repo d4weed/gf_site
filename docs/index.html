@@ -199,7 +199,17 @@
   .more-name { font-family: var(--font-sans); font-weight: 600; font-size: 19px; letter-spacing: -0.02em; color: var(--fg-1); }
   .more-wine:hover .more-name { text-decoration: underline; text-underline-offset: 3px; }
   .more-kind { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-4); }
-  @media (max-width: 800px) { .detail { grid-template-columns: 1fr; } .detail .photo { position: static; } .more-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 800px) {
+    .detail { grid-template-columns: 1fr; }
+    /* Let the header lines (back/kind/title/hook) sit ABOVE the bottle on mobile:
+       dissolve .info so its head/body become grid items, then order around the photo. */
+    .detail .info { display: contents; }
+    .detail-head { order: 1; }
+    .detail .photo { position: static; order: 2; }
+    .detail-body { order: 3; }
+    .detail .more { order: 4; }
+    .more-grid { grid-template-columns: 1fr; }
+  }
 
   /* ---------- Cart ---------- */
   .cart-view { max-width: 820px; margin: 0 auto; padding: var(--space-8) var(--gutter); }
@@ -783,19 +793,23 @@ Nosotros decidimos quedarnos.</p>
       document.getElementById('detailContent').innerHTML = `
         <div class="photo"><img src="${w.img}" alt="${tr('bottleOf')}${w.name} — ${d.kind}"></div>
         <div class="info">
-          <button class="back-link" onclick="goToAnchor('wines')">${tr('back')}</button>
-          <div class="eyebrow-line" style="margin-bottom: var(--space-4)">${d.kind}</div>
-          <h1 class="title">${w.name}</h1>
-          <p class="note" style="margin-top: var(--space-5)">${d.idea}</p>
-          <div class="detail-section"><h2>${tr('elab')}</h2><p>${d.making}</p></div>
-          <div class="detail-section"><h2>${tr('mouth')}</h2><p>${d.tasting}</p></div>
-          <div class="detail-section"><h2>${tr('table')}</h2><p>${d.pairing}</p></div>
-          <dl>
-            ${Object.entries(d.tech).map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}
-          </dl>
-          <div style="display:flex; gap: 12px;">
-            <a class="btn btn--wine" href="https://gonzalezfischer.square.site/" target="_blank" rel="noopener">${tr('buy')}</a>
-            <button class="btn" onclick="goToAnchor('wines')">${tr('backBtn')}</button>
+          <div class="detail-head">
+            <button class="back-link" onclick="goToAnchor('wines')">${tr('back')}</button>
+            <div class="eyebrow-line" style="margin-bottom: var(--space-4)">${d.kind}</div>
+            <h1 class="title">${w.name}</h1>
+            <p class="note" style="margin-top: var(--space-5)">${d.idea}</p>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section"><h2>${tr('elab')}</h2><p>${d.making}</p></div>
+            <div class="detail-section"><h2>${tr('mouth')}</h2><p>${d.tasting}</p></div>
+            <div class="detail-section"><h2>${tr('table')}</h2><p>${d.pairing}</p></div>
+            <dl>
+              ${Object.entries(d.tech).map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}
+            </dl>
+            <div style="display:flex; gap: 12px;">
+              <a class="btn btn--wine" href="https://gonzalezfischer.square.site/" target="_blank" rel="noopener">${tr('buy')}</a>
+              <button class="btn" onclick="goToAnchor('wines')">${tr('backBtn')}</button>
+            </div>
           </div>
         </div>
         <nav class="more">
