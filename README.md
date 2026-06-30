@@ -72,9 +72,19 @@ During design there was an in-page font/accent picker ("Tweaks"). It is **locked
 
 ## Deploy checklist (the few open items)
 1. ~~**Self-host the font (recommended for EU/GDPR + performance).**~~ **Done.** Instrument Sans (OFL) is now self-hosted: the variable upright (weights 400–700, latin + latin-ext subsets) lives in `assets/fonts/instrument-sans-*.woff2`, declared via `@font-face` at the top of the `<style>` block. The runtime Google-font loader (`loadGoogleFont`) and the two `<link rel="preconnect">` font lines have been removed — no visitor IPs go to Google. (Italics are not used anywhere, so only the upright file is shipped; if you ever add `font-style: italic`, fetch the italic subset too.)
-2. **Absolute `og:image`** — once the public domain is known, change `og:image` (and ideally other OG URLs) to absolute `https://…` so link-preview crawlers can fetch it. (Marked with a `TODO` comment in `<head>`.)
+2. ~~**Absolute `og:image`.**~~ **Done.** `og:url` and `og:image` are set to absolute `https://gonzalezfischer.com/…` URLs (the production domain). They only resolve in link previews once DNS points the domain at GitHub Pages — see "Custom domain cutover" below.
 3. **Favicon** — replace the wordmark `logo.png` favicon with a small square icon.
 4. **Optimise photos** — the full-bleed JPEGs are the only heavy payload; compress them (they're already `loading="lazy"` except the hero).
+
+## Custom domain cutover (gonzalezfischer.com)
+The production domain is **gonzalezfischer.com**, currently still served by a WordPress site. Do these steps **only when ready to switch**, because configuring the custom domain in GitHub Pages makes the `…github.io/gf_site/` URL redirect to the custom domain — so until DNS points here, the preview URL would redirect to whatever the domain still serves (WordPress).
+
+Preview safely in the meantime at **https://d4weed.github.io/gf_site/** (all asset paths are relative, so the subpath works; only the absolute OG meta URLs differ, and those only matter to social crawlers).
+
+Cutover steps, in order:
+1. **DNS** at the registrar — point the apex `gonzalezfischer.com` at GitHub Pages' four A records (`185.199.108.153`, `.109.153`, `.110.153`, `.111.153`) and AAAA records, and add a `www` CNAME → `d4weed.github.io`. (Removes/replaces the WordPress records — this is the irreversible-feeling step; lower the TTL a day before to speed rollback.)
+2. **CNAME file** — add a `docs/CNAME` containing `gonzalezfischer.com` (one line), commit & push.
+3. **GitHub Pages settings** → set **Custom domain** to `gonzalezfischer.com`, wait for the DNS check, then enable **Enforce HTTPS** once the cert is issued.
 
 ## How to evolve it
 - **Edit copy:** find the text in `index.html`. For bilingual strings, update **both** the visible Spanish **and** the `data-en` attribute next to it (the one easy thing to forget).
