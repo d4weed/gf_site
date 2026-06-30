@@ -162,6 +162,8 @@
   footer .reg { max-width: var(--container); margin: var(--space-5) auto 0; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-5); }
   footer .meta a { display: inline; padding: 0; font-size: inherit; letter-spacing: inherit; color: var(--fg-inv); opacity: 0.72; }
   footer .meta a:hover { opacity: 1; color: var(--fg-inv); }
+  .cookies-link { font: inherit; letter-spacing: inherit; text-transform: inherit; background: transparent; border: 0; padding: 0; margin: 0; color: var(--fg-inv); opacity: 0.72; cursor: pointer; }
+  .cookies-link:hover { opacity: 1; }
   footer .socials { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
   footer .social { display: inline-flex; align-items: center; padding: 0; transition: opacity .2s ease; }
   footer .social svg { width: 16px; height: 16px; flex: 0 0 auto; }
@@ -714,7 +716,7 @@ Nosotros decidimos quedarnos.</p>
     <p class="reg" data-en="González Fischer SL · R.E. 8870 SG 00 · 40237 · Sacramenia · Spain">González Fischer SL · R.E. 8870 SG 00 · 40237 · Sacramenia · España</p>
     <div class="meta">
       <span data-en='Photography — <a href="https://luanafischer.com/el-fondo-marino" target="_blank" rel="noopener">Luana Fischer · «El fondo marino» series ↗</a>'>Fotografía — <a href="https://luanafischer.com/el-fondo-marino" target="_blank" rel="noopener">Luana Fischer · serie «El fondo marino» ↗</a></span>
-      <span>© Vinos Artesanales González Fischer S.L.</span>
+      <span>© Vinos Artesanales González Fischer S.L. · <button type="button" id="cookies-link" class="cookies-link">Cookies</button></span>
     </div>
   </footer>
 
@@ -1175,11 +1177,19 @@ Nosotros decidimos quedarnos.</p>
       };
       const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
       const banner = document.getElementById('consent');
-      const choose = (v) => { try { localStorage.setItem(KEY, v); } catch (e) {} if (banner) banner.hidden = true; if (v === 'granted') loadGA(); };
+      const choose = (v) => {
+        try { localStorage.setItem(KEY, v); } catch (e) {}
+        if (banner) banner.hidden = true;
+        if (v === 'granted') { window['ga-disable-' + GA_ID] = false; loadGA(); }
+        else { window['ga-disable-' + GA_ID] = true; }   // stop further hits this session if consent is withdrawn
+      };
       if (banner) {
         banner.querySelector('.consent-yes').addEventListener('click', () => choose('granted'));
         banner.querySelector('.consent-no').addEventListener('click', () => choose('denied'));
       }
+      // Footer "Cookies" link re-opens the banner so visitors can change/withdraw consent.
+      const cookiesLink = document.getElementById('cookies-link');
+      if (cookiesLink && banner) cookiesLink.addEventListener('click', () => { banner.hidden = false; });
       const stored = get();
       if (stored === 'granted') loadGA();
       else if (stored !== 'denied' && banner) banner.hidden = false;   // show only when no choice made yet
