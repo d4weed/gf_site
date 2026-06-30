@@ -1,0 +1,268 @@
+/* ==========================================================================
+   González & Fischer — Colors and Type  (v2 · Rationalist)
+   A neutral, photography-driven system. One typeface. Cool neutrals.
+   The wine labels live on their own; they speak to the system through the
+   photographs, never through shared fonts.
+   ========================================================================== */
+
+/* ---------- Webfont ----------
+   One humanist grotesque for the entire web/graphics system: headings, body,
+   UI, captions. No serif anywhere on the web — that's deliberate. The labels
+   keep their own (commercial) typography on the bottle; the system stays quiet.
+
+     System face   →  Inter        (free Söhne / humanist-grotesque stand-in)
+     Data / meta   →  JetBrains Mono (lot numbers, fine print, tabular figures)
+
+   If you license Söhne (or similar), set --font-sans to it and keep Inter as
+   the fallback.
+-------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* --- Raw palette: cool neutrals + one reserved ink-blue accent ----------
+     The system is near-monochrome. Backgrounds are cool bone / true-neutral
+     grey. The single accent is a desaturated ink blue, used sparingly for
+     commerce and interactive states only.
+  ----------------------------------------------------------------------- */
+  --gf-ink:        #16181b;  /* cool near-black — type, overlays */
+  --gf-ink-soft:  #2a2d31;   /* secondary text, subheads */
+  --gf-graphite:  #4a4e54;   /* body text */
+  --gf-stone:     #656a70;   /* meta, captions — AA 4.5:1 on paper/white */
+  --gf-mist:      #b2b5ba;   /* placeholders, disabled */
+
+  --gf-paper:     #f2f3f2;   /* primary surface — cool bone white */
+  --gf-paper-2:   #e7e9e8;   /* alt surface, cool grey */
+  --gf-bone:      #f9faf9;   /* lightest — cards on paper */
+  --gf-white:     #ffffff;   /* pure white — header strip, label backs */
+
+  --gf-blue:      #34465d;   /* reserved accent — ink blue */
+  --gf-blue-hover:#26323f;
+
+  /* --- Semantic ---------------------------------------------------------- */
+  --fg-1: var(--gf-ink);        /* headings, primary body */
+  --fg-2: var(--gf-ink-soft);   /* subheads, leads */
+  --fg-3: var(--gf-graphite);   /* body text */
+  --fg-4: var(--gf-stone);      /* meta, captions */
+  --fg-5: var(--gf-mist);       /* placeholders, disabled */
+  --fg-inv: var(--gf-paper);    /* text on dark / on photography */
+
+  --bg-1: var(--gf-paper);      /* page default */
+  --bg-2: var(--gf-bone);       /* cards, quiet surfaces */
+  --bg-3: var(--gf-paper-2);    /* alt sections */
+  --bg-white: var(--gf-white);  /* headers, label backs */
+  --bg-dark: var(--gf-ink);     /* photo backdrop, footer */
+
+  --accent: var(--gf-blue);
+  --accent-hover: var(--gf-blue-hover);
+
+  --rule:        rgba(22,24,27,0.12);   /* hairline divider */
+  --rule-strong: rgba(22,24,27,0.30);   /* stronger rule */
+
+  /* --- Typography — ONE family ------------------------------------------- */
+  --font-sans:   'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:   'JetBrains Mono', ui-monospace, Menlo, monospace;
+  /* Back-compat: anything still asking for --font-serif gets the sans.
+     There is no serif in the web system by design. */
+  --font-serif:  var(--font-sans);
+
+  /* Modular scale — fluid, rooted at 16px */
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.82rem); /* @kind other */
+  --step-0:  clamp(0.95rem, 0.92rem + 0.15vw, 1.0rem); /* @kind other */
+  --step-1:  clamp(1.1rem,  1.05rem + 0.3vw, 1.25rem); /* @kind other */
+  --step-2:  clamp(1.3rem,  1.2rem + 0.5vw,  1.55rem); /* @kind other */
+  --step-3:  clamp(1.6rem,  1.4rem + 1vw,    2.1rem); /* @kind other */
+  --step-4:  clamp(2.05rem, 1.7rem + 1.9vw,  3.0rem); /* @kind other */
+  --step-5:  clamp(2.6rem,  2.0rem + 3.2vw,  4.2rem); /* @kind other */
+  --step-6:  clamp(3.1rem,  2.3rem + 4.4vw,  5.6rem); /* @kind other */
+
+  /* --- Spacing (4px grid) ------------------------------------------------ */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6.5rem;
+  --space-10: 9rem;
+
+  /* --- Radii — none. The system is rectangular and rational. ------------- */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-2: 3px;
+  --radius-pill: 999px;
+
+  /* --- Shadows — rare and soft ------------------------------------------- */
+  --shadow-1: 0 1px 2px rgba(22, 24, 27, 0.05);
+  --shadow-2: 0 2px 16px rgba(22, 24, 27, 0.07), 0 1px 2px rgba(22, 24, 27, 0.04);
+  --shadow-photo: 0 24px 60px -24px rgba(22, 24, 27, 0.32);
+
+  /* --- Motion ------------------------------------------------------------ */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1); /* @kind other */
+  --ease-in-out: cubic-bezier(0.5, 0, 0.3, 1); /* @kind other */
+  --dur-fast: 150ms; /* @kind other */
+  --dur: 280ms; /* @kind other */
+  --dur-slow: 600ms; /* @kind other */
+
+  /* --- Layout ------------------------------------------------------------ */
+  --measure: 66ch; /* @kind other */
+  --container: 1240px; /* @kind spacing */
+  --container-narrow: 760px; /* @kind spacing */
+  --gutter: clamp(1.25rem, 3vw, 2.5rem); /* @kind spacing */
+}
+
+/* ==========================================================================
+   Base elements — rationalist, single family. Hierarchy comes from scale,
+   weight and spacing, not from contrasting typefaces.
+   ========================================================================== */
+
+html { color: var(--fg-1); background: var(--bg-1); font-family: var(--font-sans); font-size: 16px; }
+body { margin: 0; line-height: 1.6; font-size: var(--step-0); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+/* --- Headings: sans, medium-bold, tight tracking ------------------------- */
+h1, .h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--step-6);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 0 0 var(--space-5);
+  color: var(--fg-1);
+  text-wrap: balance;
+}
+h2, .h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--step-4);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  margin: 0 0 var(--space-4);
+  text-wrap: balance;
+}
+h3, .h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--step-3);
+  line-height: 1.18;
+  letter-spacing: -0.018em;
+  margin: 0 0 var(--space-3);
+}
+h4, .h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--step-1);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-3);
+  color: var(--fg-1);
+}
+
+/* --- Eyebrow — uppercase, tracked, for structure ------------------------- */
+.eyebrow, .overline {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* --- Body paragraphs ----------------------------------------------------- */
+p { margin: 0 0 var(--space-4); max-width: var(--measure); text-wrap: pretty; color: var(--fg-3); }
+
+.lead {
+  font-family: var(--font-sans);
+  font-size: var(--step-2);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+  color: var(--fg-2);
+  max-width: 54ch;
+}
+
+.small { font-size: var(--step--1); color: var(--fg-4); }
+
+/* --- Tagline / motto — all-caps, tracked. The system's one signature line. */
+.tagline {
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: var(--fg-inv);
+}
+
+/* --- Quote — large sans, light, tight. Not italic. ----------------------- */
+blockquote {
+  font-family: var(--font-sans);
+  font-size: var(--step-3);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+  margin: var(--space-6) 0;
+  padding-left: var(--space-5);
+  border-left: 2px solid var(--rule-strong);
+  max-width: 50ch;
+}
+blockquote cite {
+  display: block;
+  margin-top: var(--space-3);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+
+/* --- Links — quiet, hairline underline ----------------------------------- */
+a { color: var(--fg-1); text-decoration: none; border-bottom: 1px solid var(--rule); transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
+a:hover { border-color: var(--fg-1); color: var(--accent); }
+
+/* --- Code / mono --------------------------------------------------------- */
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-2);
+  padding: 0.08em 0.35em;
+  border-radius: var(--radius-1);
+  color: var(--fg-1);
+}
+pre { font-family: var(--font-mono); font-size: 0.9em; line-height: 1.55; background: var(--bg-2); padding: var(--space-4); border-left: 2px solid var(--accent); overflow: auto; }
+
+/* --- Divider ------------------------------------------------------------- */
+hr { border: 0; border-top: 1px solid var(--rule); margin: var(--space-7) 0; }
+
+::selection { background: var(--gf-blue); color: var(--gf-paper); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* --- Tabular figures helper (rationalist tables, prices, stats) --------- */
+.tnum { font-feature-settings: "tnum" 1; font-variant-numeric: tabular-nums; }
+
+/* --- Utility wrappers ----------------------------------------------------- */
+.container       { max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+.container--narrow { max-width: var(--container-narrow); margin-inline: auto; padding-inline: var(--gutter); }
+.rule            { border-top: 1px solid var(--rule); }
+.rule--strong    { border-top: 1px solid var(--rule-strong); }
+
+/* --- Caption / image credit ---------------------------------------------- */
+.caption {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--fg-4);
+  letter-spacing: 0.01em;
+  margin-top: var(--space-2);
+}
+.caption--credit {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--fg-4);
+}
