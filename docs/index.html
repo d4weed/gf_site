@@ -825,13 +825,28 @@ Nosotros decidimos quedarnos.</p>
         </nav>
       `;
     };
-    const openDetail = (id) => {
+    const openDetail = (id, { push = true } = {}) => {
       if (!WINES.find(x => x.id === id)) return;
       state.detailId = id;
       renderDetail(id);
       route('detail');
+      // Reflect the wine in the URL (?wine=<id>) so detail pages are shareable.
+      // push:false on initial load / popstate — don't rewrite history or the URL
+      // on load (mirrors the ?lang load caveat).
+      if (push) { const u = new URL(location.href); u.searchParams.set('wine', id); history.pushState({ wine: id }, '', u); }
     };
     window.openDetail = openDetail;
+    // Drop ?wine when returning to the home view (preserves other params like ?lang).
+    const dropWineParam = () => {
+      if (!new URLSearchParams(location.search).has('wine')) return;
+      const u = new URL(location.href); u.searchParams.delete('wine'); history.pushState({}, '', u);
+    };
+    // Browser back/forward: sync the view to the URL without writing new history.
+    window.addEventListener('popstate', () => {
+      const id = new URLSearchParams(location.search).get('wine');
+      if (id && WINES.find(x => x.id === id)) openDetail(id, { push: false });
+      else if (state.route !== 'home') route('home');
+    });
 
     // ------- Router -------
     const route = (r) => {
@@ -867,12 +882,12 @@ Nosotros decidimos quedarnos.</p>
       // Returning from the detail view: jump straight to the anchor (instant, within one
       // rAF so the scroll lands before the first paint) — avoids flashing at the top and
       // then smooth-scrolling all the way down. In-page nav on home stays smooth.
-      if (state.route !== 'home') { route('home'); requestAnimationFrame(() => { doScroll('instant'); updateHeader(); }); }
+      if (state.route !== 'home') { route('home'); dropWineParam(); requestAnimationFrame(() => { doScroll('instant'); updateHeader(); }); }
       else doScroll('smooth');
     };
     window.goToAnchor = goToAnchor;
     document.querySelector('.brand').addEventListener('click', () => {
-      if (state.route !== 'home') route('home');
+      if (state.route !== 'home') { route('home'); dropWineParam(); }
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
@@ -939,9 +954,14 @@ Nosotros decidimos quedarnos.</p>
     // Use the inlined/preloaded image sources so JS-injected bottle photos survive offline bundling
     WINES.forEach(w => { const pre = document.getElementById('pre-' + w.id); if (pre && pre.src) w.img = pre.currentSrc || pre.src; });
     renderGrids();
-    const savedRoute = localStorage.getItem('gf.route');
-    if (savedRoute && savedRoute !== 'detail' && document.querySelector(`[data-view="${savedRoute}"]`)) route(savedRoute);
-    else if (savedRoute === 'detail') localStorage.removeItem('gf.route');
+    const urlWine = new URLSearchParams(location.search).get('wine');
+    if (urlWine && WINES.find(x => x.id === urlWine)) {
+      openDetail(urlWine, { push: false });   // shareable deep link — URL already set, don't rewrite on load
+    } else {
+      const savedRoute = localStorage.getItem('gf.route');
+      if (savedRoute && savedRoute !== 'detail' && document.querySelector(`[data-view="${savedRoute}"]`)) route(savedRoute);
+      else if (savedRoute === 'detail') localStorage.removeItem('gf.route');
+    }
 
     // ------- i18n: static-text swap + language switch (ES / EN) -------
     const i18nEls = Array.from(document.querySelectorAll('[data-en]'));

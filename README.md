@@ -29,7 +29,8 @@ docs/
 
 ## Architecture
 - **One HTML file.** Page-specific CSS lives in a `<style>` block in `<head>`; shared tokens/type live in `colors_and_type.css` (linked first, so the page can override). Vanilla JS at the end of `<body>` — no libraries, no framework.
-- **Two "views"** (`[data-view="home"]` and `[data-view="detail"]`) toggled by a tiny client-side router (`route()`); the wine **detail** view is rendered from data by `renderDetail()`. No real URLs/pages — it's a single-page interaction. Current route is remembered in `localStorage` (`gf.route`).
+- **Two "views"** (`[data-view="home"]` and `[data-view="detail"]`) toggled by a tiny client-side router (`route()`); the wine **detail** view is rendered from data by `renderDetail()`. Single-page interaction; current route is remembered in `localStorage` (`gf.route`).
+- **Shareable detail links:** opening a wine sets `?wine=<id>` on the URL via `history.pushState` (alongside any `?lang=`), so detail pages can be shared/bookmarked; loading such a URL opens that wine (`openDetail(id, {push:false})` in init — read-only on load, per the `?lang` caveat). Browser back/forward is wired through a `popstate` handler, and returning home (`dropWineParam()`) strips the param. Works on GitHub Pages with no server (query string, not a real path).
 - **Content as data:** the three wines live in the `WINES` array in the `<script>` (id, name, price, image, plus `idea` / `making` / `tasting` / `pairing` / `tech`, and an `en:{…}` block mirroring all text). Narrative prose (the chapters) lives directly in the HTML.
 
 ## Internationalisation (ES / EN)
