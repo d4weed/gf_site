@@ -55,6 +55,16 @@
 
   main { max-width: 30rem; width: 100%; }
 
+  /* Matches the age gate's treatment (index.html): the logo is pre-gate
+     content there too, shown above the age question itself. */
+  .logo {
+    height: 26px;
+    width: auto;
+    display: block;
+    filter: invert(1) brightness(2.2);
+    margin-bottom: 2.25rem;
+  }
+
   .code {
     font-size: 0.75rem;
     letter-spacing: 0.14em;
@@ -86,6 +96,8 @@
 </head>
 <body>
   <main>
+    <img class="logo" src="/assets/logo.png" alt="González ♡ Fischer">
+
     <p class="code">Error 404</p>
 
     <p>Esta página no existe, o ya no está aquí.</p>
